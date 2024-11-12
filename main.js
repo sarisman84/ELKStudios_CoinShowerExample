@@ -13,6 +13,8 @@ const maxRotationAmm = 1.0;
 //Controls the minimum and maximum horizontal velocity a coin can have
 const minXVelocity = -2.5;
 const maxXVelocity = 2.5;
+//Controls the speed in which a coin becomes visible
+const fadeAmount = 2;
 
 class ParticleSystem extends PIXI.Container {
 	constructor() {
@@ -22,17 +24,6 @@ class ParticleSystem extends PIXI.Container {
 		this.duration = 500;
 		//Generate a set amount of particles and save them.
 		this.particleDataset = this.generateParticles(50);
-		
-		//this.randomizePositions(50, 750, 0, 400);
-		// Create a sprite
-		// let sp = game.sprite("CoinsGold000");
-		// // Set pivot to center of said sprite
-		// sp.pivot.x = sp.width / 2;
-		// sp.pivot.y = sp.height / 2;
-		// // Add the sprite particle to our particle effect
-		// this.addChild(sp);
-		// // Save a reference to the sprite particle
-		// this.sp = sp;
 	}
 	animTick(nt, lt, gt) {
 		// Every update we get three different time variables: nt, lt and gt.
@@ -49,13 +40,18 @@ class ParticleSystem extends PIXI.Container {
 			let num = ("000" + Math.floor(nt * 8)).substr(-3);
 			game.setTexture(sp, "CoinsGold" + num);
 
-			//If it is out of bounds (like outside the view port), reset its position and randomize the particle's properties.
+			//If it is out of bounds (like outside the view port), reset its position and alpha and randomize the particle's properties.
 			if (sp.y >= yLimit) {
 				sp.x = game.renderer.width / 2.0;
 				sp.y = game.renderer.height / 2.0;
+				sp.alpha = 0
 				this.randomizeParticle(this.particleDataset[i]);
 			}
-
+			//If the particle is not visible, make it visible overtime.
+			if (sp.alpha < 1.0) {
+				//Apply the fade amount in a slower scale.
+				sp.alpha += fadeAmount / 100;
+			}
 			//Apply gravity
 			sp.y += data.gravityAmount;
 			//Apply horizontal velocity
@@ -118,6 +114,8 @@ class ParticleSystem extends PIXI.Container {
 			//Center the sprite to the middle of the screen
 			sp.x = game.renderer.width / 2.0;
 			sp.y = game.renderer.height / 2.0;
+			//Make the sprite invisible
+			sp.alpha = 0;
 			// Add the sprite particle to our particle effect
 			this.addChild(sp);
 			// Get a randomized gravity value
@@ -137,8 +135,6 @@ class ParticleSystem extends PIXI.Container {
 		//Return the references to the generated particles and their included information.
 		return result;
 	}
-
-	
 }
 
 // ----- End of the assigment ----- //
