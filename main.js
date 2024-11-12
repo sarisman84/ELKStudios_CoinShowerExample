@@ -1,4 +1,18 @@
 // ----- Start of the assigment ----- //
+//Default values
+const defaultSprite = "CoinsGold000";
+//Controls the minimum and maximum gravity amount
+const minGravityAmount = -2.5;
+const maxGravityAmount = 3.5;
+//Controls the minimum and maximum size a coin can have
+const minSize = 0.5;
+const maxSize = 0.75;
+//Controls the minimum and maximum rotation a coin can have
+const minRotationAmm = -1.0;
+const maxRotationAmm = 1.0;
+//Controls the minimum and maximum horizontal velocity a coin can have
+const minXVelocity = -2.5;
+const maxXVelocity = 2.5;
 
 class ParticleSystem extends PIXI.Container {
 	constructor() {
@@ -6,9 +20,10 @@ class ParticleSystem extends PIXI.Container {
 		// Set start and duration for this effect in milliseconds
 		this.start = 0;
 		this.duration = 500;
-
-		this.generateParticles(100)
-		this.randomizeParticlePositions(this.particles, 250, 450, 150 ,350);
+		//Generate a set amount of particles and save them.
+		this.particleDataset = this.generateParticles(50);
+		
+		//this.randomizePositions(50, 750, 0, 400);
 		// Create a sprite
 		// let sp = game.sprite("CoinsGold000");
 		// // Set pivot to center of said sprite
@@ -25,9 +40,33 @@ class ParticleSystem extends PIXI.Container {
 		//       just dividing local time with duration of this effect.
 		//   lt: Local time in milliseconds, from 0 to this.duration.
 		//   gt: Global time in milliseconds,
+		for (let i = 0; i < this.particleDataset.length; i++) {
+			const yLimit = 550;
 
+			var data = this.particleDataset[i];
+			var sp = data.sp;
+			//Apply coin animation
+			let num = ("000" + Math.floor(nt * 8)).substr(-3);
+			game.setTexture(sp, "CoinsGold" + num);
 
-		this.animateParticles(this.particles, nt);
+			//If it is out of bounds (like outside the view port), reset its position and randomize the particle's properties.
+			if (sp.y >= yLimit) {
+				sp.x = game.renderer.width / 2.0;
+				sp.y = game.renderer.height / 2.0;
+				this.randomizeParticle(this.particleDataset[i]);
+			}
+
+			//Apply gravity
+			sp.y += data.gravityAmount;
+			//Apply horizontal velocity
+			sp.x += data.xVelocity;
+
+			//Apply rotation in a slower scale.
+			sp.rotation += data.rotation / 25;
+			//Increment the gravity in a slower scale.
+			data.gravityAmount += nt / 25;
+		}
+
 		// Set a new texture on a sprite particle
 		// let num = ("000" + Math.floor(nt * 8)).substr(-3);
 		// game.setTexture(this.sp, "CoinsGold" + num);
@@ -44,42 +83,62 @@ class ParticleSystem extends PIXI.Container {
 		// this.sp.rotation = nt*Math.PI*2;
 	}
 
+	randomizeParticle(particleToRandomize) {
+		let randomizedGravityValue = this.minMaxRandom(
+			minGravityAmount,
+			maxGravityAmount
+		);
+
+		particleToRandomize.defaultGravityAmount = randomizedGravityValue;
+		particleToRandomize.gravityAmount = randomizedGravityValue;
+		particleToRandomize.rotation = this.minMaxRandom(
+			minRotationAmm,
+			maxRotationAmm
+		);
+		particleToRandomize.xVelocity = this.minMaxRandom(
+			minXVelocity,
+			maxXVelocity
+		);
+	}
+
+	minMaxRandom(min, max) {
+		return Math.random() * (max - min) + min;
+	}
+
 	generateParticles(particleAmount) {
 		let result = [];
 		for (let i = 0; i < particleAmount; i++) {
-			let sp = game.sprite("CoinsGold000");
+			//create a sprite
+			let sp = game.sprite(defaultSprite);
 			// Set pivot to center of said sprite
 			sp.pivot.x = sp.width / 2;
 			sp.pivot.y = sp.height / 2;
+			//Set a random size to said sprite
+			sp.scale.x = sp.scale.y = this.minMaxRandom(minSize, maxSize);
+			//Center the sprite to the middle of the screen
+			sp.x = game.renderer.width / 2.0;
+			sp.y = game.renderer.height / 2.0;
 			// Add the sprite particle to our particle effect
 			this.addChild(sp);
-			result.push(sp);
+			// Get a randomized gravity value
+			let randomizedGravityValue = this.minMaxRandom(
+				minGravityAmount,
+				maxGravityAmount
+			);
+			// Store a reference to the sprite particle as well as some randomn values to gravity and rotation.
+			result.push({
+				defaultGravityAmount: randomizedGravityValue, //Value where the gravity resets to
+				gravityAmount: randomizedGravityValue, //temporary value
+				sp: sp,
+				rotation: this.minMaxRandom(minRotationAmm, maxRotationAmm), //Rotation Delta
+				xVelocity: this.minMaxRandom(minXVelocity, maxXVelocity), //X Velocity
+			});
 		}
-		this.particles = result;
+		//Return the references to the generated particles and their included information.
+		return result;
 	}
 
-	randomizeParticlePositions(
-		particlesToRandomize,
-		minRandomX,
-		maxRandomX,
-		minRandomY,
-		maxRandomY
-	) {
-		for (let i = 0; i < particlesToRandomize.length; i++) {
-			let sp = particlesToRandomize[i];
-			let yPos = minRandomY + Math.random() * (maxRandomY - minRandomY);
-			let xPos = minRandomX + Math.random() * (maxRandomX - minRandomX);
-			sp.x = xPos;
-			sp.y = yPos;
-		}
-	}
-
-	animateParticles(particlesToAnimate, nt) {
-		for (let i = 0; i < particlesToAnimate.length; i++) {
-			let num = ("000" + Math.floor(nt * 8)).substr(-3);
-			game.setTexture(particlesToAnimate[i], "CoinsGold" + num);
-		}
-	}
+	
 }
 
 // ----- End of the assigment ----- //
