@@ -14,7 +14,7 @@ const maxRotationAmm = 1.0;
 const minXVelocity = -5.5;
 const maxXVelocity = 5.5;
 //Controls the speed in which a coin becomes visible
-const fadeAmount = 2;
+const fadeAmount = 3;
 
 class ParticleSystem extends PIXI.Container {
 	constructor() {
@@ -47,11 +47,11 @@ class ParticleSystem extends PIXI.Container {
 				sp.alpha = 0
 				this.randomizeParticle(this.particleDataset[i]);
 			}
-			//If the particle is not visible, make it visible overtime.
-			if (sp.alpha < 1.0) {
-				//Apply the fade amount in a slower scale.
-				sp.alpha += fadeAmount / 100;
-			}
+
+			//Apply the fade amount in a slower scale.
+			sp.alpha += fadeAmount / 100;
+			//Make sure the alpha value doesnt go beyond 1.
+			sp.alpha = Math.min(sp.alpha, 1)
 			//Apply gravity
 			sp.y += data.gravityAmount * 4.0;
 			//Apply horizontal velocity
