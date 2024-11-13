@@ -1,18 +1,18 @@
 // ----- Start of the assigment ----- //
-//Default values
+//Values to tweak. Usually you would want a file or a tool to modify these instead of them being hard-coded.
 const defaultSprite = "CoinsGold000";
 //Controls the minimum and maximum gravity amount
-const minGravityAmount = -2.5;
+const minGravityAmount = -1.5;
 const maxGravityAmount = 3.5;
 //Controls the minimum and maximum size a coin can have
-const minSize = 0.5;
-const maxSize = 0.75;
+const minSize = 0.25;
+const maxSize = 0.5;
 //Controls the minimum and maximum rotation a coin can have
 const minRotationAmm = -1.0;
 const maxRotationAmm = 1.0;
 //Controls the minimum and maximum horizontal velocity a coin can have
-const minXVelocity = -2.5;
-const maxXVelocity = 2.5;
+const minXVelocity = -5.5;
+const maxXVelocity = 5.5;
 //Controls the speed in which a coin becomes visible
 const fadeAmount = 2;
 
@@ -23,7 +23,7 @@ class ParticleSystem extends PIXI.Container {
 		this.start = 0;
 		this.duration = 500;
 		//Generate a set amount of particles and save them.
-		this.particleDataset = this.generateParticles(50);
+		this.particleDataset = this.generateParticles(10);
 	}
 	animTick(nt, lt, gt) {
 		// Every update we get three different time variables: nt, lt and gt.
@@ -53,7 +53,7 @@ class ParticleSystem extends PIXI.Container {
 				sp.alpha += fadeAmount / 100;
 			}
 			//Apply gravity
-			sp.y += data.gravityAmount;
+			sp.y += data.gravityAmount * 4.0;
 			//Apply horizontal velocity
 			sp.x += data.xVelocity;
 
