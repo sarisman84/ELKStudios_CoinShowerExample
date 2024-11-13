@@ -79,12 +79,15 @@ class ParticleSystem extends PIXI.Container {
 		// this.sp.rotation = nt*Math.PI*2;
 	}
 
+	//Randomize a particle's variables
 	randomizeParticle(particleToRandomize) {
+		//Randomize the gravity value and apply it to both the temporary and default value.
 		let randomizedGravityValue = this.minMaxRandom(
 			minGravityAmount,
 			maxGravityAmount
 		);
-
+		
+		//Apply new random values.
 		particleToRandomize.defaultGravityAmount = randomizedGravityValue;
 		particleToRandomize.gravityAmount = randomizedGravityValue;
 		particleToRandomize.rotation = this.minMaxRandom(
